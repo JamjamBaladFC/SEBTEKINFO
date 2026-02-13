@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIPETA Intelligence Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Gaya Tampilan CSS sama persis dengan versi sebelumnya */
+        :root { --bg-color: #f3f4f6; --surface: #ffffff; --text-main: #1f2937; --text-muted: #6b7280; --border: #e5e7eb; --theme-energi: #f59e0b; --theme-pangan: #10b981; --theme-bencana: #ef4444; --theme-ekonomi: #2563eb; --theme-teknologi: #8b5cf6; --theme-geospatial: #0ea5e9; --theme-kesehatan: #ec4899; --active-theme: var(--theme-energi); }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-color); color: var(--text-main); margin: 0; padding-bottom: 60px; }
+        header { background: var(--surface); padding: 1.5rem 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+        .logo span { transition: color 0.3s ease; color: var(--active-theme); }
+        .nav-tabs { display: flex; gap: 8px; background: #f8fafc; padding: 6px; border-radius: 12px; border: 1px solid var(--border); max-width: 100%; overflow-x: auto; white-space: nowrap; }
+        .nav-tabs::-webkit-scrollbar { display: none; }
+        .nav-tabs { -ms-overflow-style: none; scrollbar-width: none; }
+        .tab-btn { border: none; background: transparent; padding: 10px 18px; font-weight: 600; font-size: 0.95rem; border-radius: 8px; cursor: pointer; color: var(--text-muted); transition: all 0.3s ease; }
+        .tab-btn:hover { color: var(--text-main); }
+        .tab-btn.active[data-cat="energi"] { background: var(--theme-energi); color: white; }
+        .tab-btn.active[data-cat="pangan"] { background: var(--theme-pangan); color: white; }
+        .tab-btn.active[data-cat="bencana"] { background: var(--theme-bencana); color: white; }
+        .tab-btn.active[data-cat="ekonomi"] { background: var(--theme-ekonomi); color: white; }
+        .tab-btn.active[data-cat="teknologi"] { background: var(--theme-teknologi); color: white; }
+        .tab-btn.active[data-cat="geospatial"] { background: var(--theme-geospatial); color: white; }
+        .tab-btn.active[data-cat="kesehatan"] { background: var(--theme-kesehatan); color: white; }
+        .news-header { margin: 2.5rem 0 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: flex-end; }
+        .news-header h2 { margin: 0; font-size: 1.8rem; font-weight: 800; }
+        .last-update { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+        .card { background: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; border: 1px solid transparent; }
+        .card:hover { transform: translateY(-6px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.1); border-color: var(--active-theme); }
+        .img-wrapper { position: relative; height: 200px; overflow: hidden; background: #e2e8f0; }
+        .img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .card:hover .img-wrapper img { transform: scale(1.05); }
+        .source-badge { position: absolute; top: 12px; left: 12px; background: rgba(0, 0, 0, 0.7); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; backdrop-filter: blur(4px); }
+        .card-content { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-date { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem; font-weight: 600; }
+        .card-title { font-size: 1.15rem; font-weight: 700; margin: 0 0 1rem; line-height: 1.4; color: var(--text-main); }
+        .read-more { margin-top: auto; display: inline-flex; font-weight: 600; font-size: 0.95rem; text-decoration: none; color: var(--active-theme); }
+        .read-more:hover { text-decoration: underline; }
+        .loader-container { padding: 4rem 0; text-align: center; color: var(--text-muted); font-weight: 600; }
+        .error-box { background: #fee2e2; color: #991b1b; padding: 1.5rem; border-radius: 12px; text-align: center; margin: 2rem 0; border: 1px solid #fca5a5; }
+        .refresh-btn { background: #e5e7eb; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--text-main); }
+        .refresh-btn:hover { background: #d1d5db; }
+        @media (max-width: 768px) { .header-content { justify-content: center; } .news-header { flex-direction: column; align-items: flex-start; gap: 8px; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-content">
+            <div class="logo">AIPETA<span>News</span>.</div>
+            <div class="nav-tabs">
+                <button class="tab-btn active" data-cat="energi" onclick="switchTab('energi')">⚡ Energi</button>
+                <button class="tab-btn" data-cat="pangan" onclick="switchTab('pangan')">🌾 Pangan</button>
+                <button class="tab-btn" data-cat="bencana" onclick="switchTab('bencana')">🚨 Bencana</button>
+                <button class="tab-btn" data-cat="ekonomi" onclick="switchTab('ekonomi')">📈 Ekonomi</button>
+                <button class="tab-btn" data-cat="teknologi" onclick="switchTab('teknologi')">💻 Teknologi</button>
+                <button class="tab-btn" data-cat="geospatial" onclick="switchTab('geospatial')">🗺️ Geospatial</button>
+                <button class="tab-btn" data-cat="kesehatan" onclick="switchTab('kesehatan')">🧬 Kesehatan</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="news-header">
+            <h2 id="section-title">Berita Energi Terkini</h2>
+            <div class="last-update">
+                <span id="last-update">Menunggu pembaruan...</span>
+                <button class="refresh-btn" onclick="forceRefresh()">↻ Segarkan</button>
+            </div>
+        </div>
+
+        <div id="status-area"></div>
+        <div id="news-grid" class="grid"></div>
+    </main>
+
+    <script>
+        const CACHE_MINUTES = 60; 
+        const THEMES = { energi: { title: 'Berita Energi Terkini', color: '#f59e0b' }, pangan: { title: 'Info Ketahanan Pangan', color: '#10b981' }, bencana: { title: 'Pantauan Bencana', color: '#ef4444' }, ekonomi: { title: 'Berita Ekonomi', color: '#2563eb' }, teknologi: { title: 'Inovasi Teknologi', color: '#8b5cf6' }, geospatial: { title: 'Info Geospatial', color: '#0ea5e9' }, kesehatan: { title: 'Sains & Kesehatan', color: '#ec4899' } };
+
+        let currentCategory = 'energi';
+        const gridArea = document.getElementById('news-grid');
+        const statusArea = document.getElementById('status-area');
+        const sectionTitle = document.getElementById('section-title');
+        const lastUpdate = document.getElementById('last-update');
+        const rootVars = document.documentElement;
+
+        async function switchTab(category) {
+            currentCategory = category;
+            const config = THEMES[category];
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.tab-btn[data-cat="${category}"]`).classList.add('active');
+            rootVars.style.setProperty('--active-theme', config.color);
+            sectionTitle.innerText = config.title;
+            await fetchNewsFromServer(category, false);
+        }
+
+        async function forceRefresh() { await fetchNewsFromServer(currentCategory, true); }
+
+        async function fetchNewsFromServer(category, isForceRefresh) {
+            const cacheKeyData = `aipeta_news_${category}`;
+            const cacheKeyTime = `aipeta_time_${category}`;
+            const now = new Date().getTime();
+
+            if (!isForceRefresh) {
+                const savedData = localStorage.getItem(cacheKeyData);
+                const savedTime = localStorage.getItem(cacheKeyTime);
+                if (savedData && savedTime) {
+                    const timeDiff = (now - savedTime) / (1000 * 60);
+                    if (timeDiff < CACHE_MINUTES) {
+                        gridArea.innerHTML = ''; statusArea.innerHTML = '';
+                        renderCards(JSON.parse(savedData), category);
+                        const timeStr = new Date(parseInt(savedTime)).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+                        lastUpdate.innerText = `Terakhir update: ${timeStr} WIB (Hemat)`;
+                        return; 
+                    }
+                }
+            }
+
+            gridArea.innerHTML = '';
+            statusArea.innerHTML = `<div class="loader-container">🔄 Menghubungi Server AIPETA...</div>`;
+            lastUpdate.innerText = "Memperbarui...";
+
+            try {
+                // INI BAGIAN PENTING: Menghubungi API Backend Anda sendiri
+                const response = await fetch(`/api/news?category=${category}`);
+                const data = await response.json();
+
+                if(data.status !== 'ok') throw new Error(data.message);
+
+                localStorage.setItem(cacheKeyData, JSON.stringify(data.items));
+                localStorage.setItem(cacheKeyTime, now.toString());
+
+                statusArea.innerHTML = ''; 
+                lastUpdate.innerText = `Tepat Waktu: ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})} WIB`;
+
+                if (data.items.length > 0) renderCards(data.items, category);
+                else statusArea.innerHTML = '<div class="error-box">Belum ada berita terbaru.</div>';
+            } catch (err) {
+                statusArea.innerHTML = `<div class="error-box"><strong>Koneksi Terputus</strong><br>Sistem gagal menghubungi server.</div>`;
+            }
+        }
+
+        function cleanTitle(title) { const parts = title.split(' - '); if (parts.length > 1) parts.pop(); return parts.join(' - '); }
+        function getSourceName(title) { const parts = title.split(' - '); return parts.length > 1 ? parts[parts.length - 1] : 'News'; }
+
+        function renderCards(articles, category) {
+            articles.forEach(item => {
+                const date = new Date(item.pubDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                const cleanStrTitle = cleanTitle(item.title);
+                const sourceMedia = getSourceName(item.title);
+
+                const cardHTML = `
+                    <article class="card">
+                        <div class="img-wrapper">
+                            <span class="source-badge">${sourceMedia}</span>
+                            <img src="${item.imageUrl}" alt="Berita AIPETA" onerror="this.src='https://placehold.co/600x400/e2e8f0/64748b?text=AIPETA+News'">
+                        </div>
+                        <div class="card-content">
+                            <div class="card-date">📅 ${date}</div>
+                            <h3 class="card-title">${cleanStrTitle}</h3>
+                            <a href="${item.link}" target="_blank" class="read-more">Baca Selengkapnya →</a>
+                        </div>
+                    </article>
+                `;
+                gridArea.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        }
+
+        switchTab('energi');
+    </script>
+</body>
+</html>
